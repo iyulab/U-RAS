@@ -1,6 +1,8 @@
 //! U-RAS - Universal Resource Allocation and Scheduling
 //!
 //! A domain-agnostic scheduling engine for resource allocation optimization.
+
+#![allow(ambiguous_glob_reexports)]
 //!
 //! # Overview
 //!
