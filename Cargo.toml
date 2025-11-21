@@ -1,0 +1,23 @@
+[package]
+name = "u-ras"
+version = "0.1.0"
+edition = "2021"
+description = "Universal Resource Allocation and Scheduling Engine"
+license = "MIT"
+repository = "https://github.com/iyulab/U-RAS"
+keywords = ["scheduling", "optimization", "resource-allocation", "genetic-algorithm"]
+categories = ["algorithms", "science"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+chrono = { version = "0.4", features = ["serde"] }
+rand = "0.8"
+rayon = "1.10"
+
+[dev-dependencies]
+pretty_assertions = "1.4"
+
+[lib]
+name = "u_ras"
+crate-type = ["lib", "cdylib"]
