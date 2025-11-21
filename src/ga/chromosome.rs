@@ -67,6 +67,49 @@ impl Chromosome {
         }
     }
 
+    /// Create chromosome with shortest processing time
+    pub fn with_shortest_time(
+        activities: &[ActivityInfo],
+        process_times: &std::collections::HashMap<(String, String), i64>,
+        rng: &mut impl Rng,
+    ) -> Self {
+        let (osv, activity_index) = Self::create_random_osv(activities, rng);
+        let mav = Self::create_shortest_time_mav(activities, process_times);
+
+        Self {
+            osv,
+            mav,
+            activity_index,
+            fitness: f64::INFINITY,
+        }
+    }
+
+    /// Create MAV - shortest processing time
+    fn create_shortest_time_mav(
+        activities: &[ActivityInfo],
+        process_times: &std::collections::HashMap<(String, String), i64>,
+    ) -> Vec<String> {
+        activities
+            .iter()
+            .map(|act| {
+                if act.candidates.is_empty() {
+                    return "NONE".to_string();
+                }
+
+                // Select resource with shortest processing time
+                act.candidates
+                    .iter()
+                    .min_by_key(|c| {
+                        process_times
+                            .get(&(act.activity_id.clone(), (*c).clone()))
+                            .unwrap_or(&i64::MAX)
+                    })
+                    .cloned()
+                    .unwrap_or_else(|| act.candidates[0].clone())
+            })
+            .collect()
+    }
+
     /// Create OSV - random order
     fn create_random_osv(
         activities: &[ActivityInfo],

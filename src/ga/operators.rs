@@ -43,6 +43,24 @@ impl Default for GeneticOperators {
     }
 }
 
+/// Tournament selection
+pub fn tournament_selection<'a>(
+    population: &'a [Chromosome],
+    tournament_size: usize,
+    rng: &mut impl Rng,
+) -> &'a Chromosome {
+    let mut best_idx = rng.gen_range(0..population.len());
+
+    for _ in 1..tournament_size {
+        let idx = rng.gen_range(0..population.len());
+        if population[idx].fitness < population[best_idx].fitness {
+            best_idx = idx;
+        }
+    }
+
+    &population[best_idx]
+}
+
 impl GeneticOperators {
     /// Perform crossover
     pub fn crossover(
