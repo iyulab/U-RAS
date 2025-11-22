@@ -2,11 +2,13 @@
 name = "u-ras"
 version = "0.1.0"
 edition = "2021"
-description = "Universal Resource Allocation and Scheduling Engine"
-license = "MIT"
+description = "High-performance optimization algorithms: GA, CP-SAT, and constraint propagation"
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/iyulab/U-RAS"
-keywords = ["scheduling", "optimization", "resource-allocation", "genetic-algorithm"]
+readme = "README.md"
+keywords = ["genetic-algorithm", "constraint-programming", "optimization", "scheduling", "cp-sat"]
 categories = ["algorithms", "science"]
+authors = ["iyulab team"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
