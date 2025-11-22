@@ -220,15 +220,13 @@ impl GeneticOperators {
             if child_idx == start {
                 break;
             }
-            if !segment.contains(item)
+            if (!segment.contains(item)
                 || segment.iter().filter(|&x| x == item).count()
-                    < p2.iter().filter(|&x| x == item).count()
-            {
-                if child[child_idx].is_empty() {
+                    < p2.iter().filter(|&x| x == item).count())
+                && child[child_idx].is_empty() {
                     child[child_idx] = item.clone();
                     child_idx = (child_idx + 1) % p1.len();
                 }
-            }
         }
 
         child

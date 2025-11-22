@@ -134,7 +134,7 @@ impl Default for SimpleCpSolver {
 impl CpSolver for SimpleCpSolver {
     fn solve(&self, model: &CpModel, _config: &SolverConfig) -> CpSolution {
         // 모델 유효성 검사
-        if let Err(_) = model.validate() {
+        if model.validate().is_err() {
             return CpSolution::empty(SolverStatus::ModelInvalid);
         }
 
