@@ -36,9 +36,7 @@ pub enum Constraint {
         cost_ms: i64,
     },
     /// Synchronization - activities must start together
-    Synchronize {
-        activity_ids: Vec<String>,
-    },
+    Synchronize { activity_ids: Vec<String> },
 }
 
 impl Constraint {
@@ -121,10 +119,8 @@ impl TransitionMatrix {
 
     /// Set transition time
     pub fn set_transition(&mut self, from: &str, to: &str, time_ms: i64) {
-        self.transitions.insert(
-            (from.to_string(), to.to_string()),
-            time_ms,
-        );
+        self.transitions
+            .insert((from.to_string(), to.to_string()), time_ms);
     }
 
     /// Get transition time
@@ -150,7 +146,9 @@ pub struct TransitionMatrixCollection {
 
 impl TransitionMatrixCollection {
     pub fn new() -> Self {
-        Self { matrices: Vec::new() }
+        Self {
+            matrices: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, matrix: TransitionMatrix) {

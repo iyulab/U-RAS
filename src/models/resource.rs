@@ -2,9 +2,9 @@
 //!
 //! Domain-agnostic representation of resources
 
+use super::calendar::Calendar;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use super::calendar::Calendar;
 
 /// Resource - An entity that can be allocated to activities
 ///

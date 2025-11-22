@@ -32,11 +32,19 @@ pub struct TimeVar {
 
 impl TimeVar {
     pub fn new(min: i64, max: i64) -> Self {
-        Self { min, max, fixed: None }
+        Self {
+            min,
+            max,
+            fixed: None,
+        }
     }
 
     pub fn fixed(value: i64) -> Self {
-        Self { min: value, max: value, fixed: Some(value) }
+        Self {
+            min: value,
+            max: value,
+            fixed: Some(value),
+        }
     }
 
     pub fn is_fixed(&self) -> bool {
@@ -57,11 +65,19 @@ pub struct DurationVar {
 
 impl DurationVar {
     pub fn new(min: i64, max: i64) -> Self {
-        Self { min, max, fixed: None }
+        Self {
+            min,
+            max,
+            fixed: None,
+        }
     }
 
     pub fn fixed(value: i64) -> Self {
-        Self { min: value, max: value, fixed: Some(value) }
+        Self {
+            min: value,
+            max: value,
+            fixed: Some(value),
+        }
     }
 }
 
@@ -74,7 +90,10 @@ pub struct BoolVar {
 
 impl BoolVar {
     pub fn new(name: impl Into<String>) -> Self {
-        Self { name: name.into(), fixed: None }
+        Self {
+            name: name.into(),
+            fixed: None,
+        }
     }
 }
 
@@ -89,7 +108,12 @@ pub struct IntVar {
 
 impl IntVar {
     pub fn new(name: impl Into<String>, min: i64, max: i64) -> Self {
-        Self { name: name.into(), min, max, fixed: None }
+        Self {
+            name: name.into(),
+            min,
+            max,
+            fixed: None,
+        }
     }
 }
 
@@ -141,8 +165,7 @@ mod tests {
 
     #[test]
     fn test_optional_interval() {
-        let var = IntervalVar::new("op1", 0, 100, 50, 200)
-            .as_optional("op1_present");
+        let var = IntervalVar::new("op1", 0, 100, 50, 200).as_optional("op1_present");
         assert!(var.is_optional);
         assert!(var.presence.is_some());
     }

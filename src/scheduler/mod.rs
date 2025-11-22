@@ -2,8 +2,8 @@
 //!
 //! Provides various scheduling strategies for resource allocation
 
-mod simple;
 mod kpi;
+mod simple;
 
-pub use simple::*;
 pub use kpi::*;
+pub use simple::*;

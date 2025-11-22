@@ -129,17 +129,25 @@ impl Schedule {
 
     /// Get assignment for activity
     pub fn assignment_for_activity(&self, activity_id: &str) -> Option<&Assignment> {
-        self.assignments.iter().find(|a| a.activity_id == activity_id)
+        self.assignments
+            .iter()
+            .find(|a| a.activity_id == activity_id)
     }
 
     /// Get assignments for task
     pub fn assignments_for_task(&self, task_id: &str) -> Vec<&Assignment> {
-        self.assignments.iter().filter(|a| a.task_id == task_id).collect()
+        self.assignments
+            .iter()
+            .filter(|a| a.task_id == task_id)
+            .collect()
     }
 
     /// Get assignments for resource
     pub fn assignments_for_resource(&self, resource_id: &str) -> Vec<&Assignment> {
-        self.assignments.iter().filter(|a| a.resource_id == resource_id).collect()
+        self.assignments
+            .iter()
+            .filter(|a| a.resource_id == resource_id)
+            .collect()
     }
 
     /// Calculate resource utilization
@@ -148,7 +156,8 @@ impl Schedule {
             return 0.0;
         }
 
-        let busy_time: i64 = self.assignments_for_resource(resource_id)
+        let busy_time: i64 = self
+            .assignments_for_resource(resource_id)
             .iter()
             .map(|a| a.duration_ms())
             .sum();
@@ -165,7 +174,9 @@ impl Schedule {
         }
 
         for assignment in &self.assignments {
-            let entry = utilizations.entry(assignment.resource_id.clone()).or_insert(0.0);
+            let entry = utilizations
+                .entry(assignment.resource_id.clone())
+                .or_insert(0.0);
             *entry += assignment.duration_ms() as f64 / self.makespan_ms as f64;
         }
 

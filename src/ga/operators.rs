@@ -2,8 +2,8 @@
 //!
 //! Domain-agnostic genetic operators for scheduling
 
+use super::chromosome::{ActivityInfo, Chromosome};
 use rand::prelude::*;
-use super::chromosome::{Chromosome, ActivityInfo};
 
 /// Genetic operators configuration
 #[derive(Debug, Clone)]
@@ -95,11 +95,7 @@ impl GeneticOperators {
         if !chromosome.mav.is_empty() && !activities.is_empty() {
             let idx = rng.gen_range(0..chromosome.mav.len().min(activities.len()));
             if !activities[idx].candidates.is_empty() {
-                chromosome.mav[idx] = activities[idx]
-                    .candidates
-                    .choose(rng)
-                    .unwrap()
-                    .clone();
+                chromosome.mav[idx] = activities[idx].candidates.choose(rng).unwrap().clone();
             }
         }
 
@@ -127,10 +123,8 @@ impl GeneticOperators {
 
         // Random task set
         let set_size = rng.gen_range(1..=task_ids.len().max(1));
-        let selected: std::collections::HashSet<String> = task_ids
-            .choose_multiple(rng, set_size)
-            .cloned()
-            .collect();
+        let selected: std::collections::HashSet<String> =
+            task_ids.choose_multiple(rng, set_size).cloned().collect();
 
         let child1_osv = self.pox_build_child(&p1.osv, &p2.osv, &selected);
         let child2_osv = self.pox_build_child(&p2.osv, &p1.osv, &selected);
@@ -205,7 +199,13 @@ impl GeneticOperators {
         (child1, child2)
     }
 
-    fn lox_build_child(&self, p1: &[String], p2: &[String], start: usize, end: usize) -> Vec<String> {
+    fn lox_build_child(
+        &self,
+        p1: &[String],
+        p2: &[String],
+        start: usize,
+        end: usize,
+    ) -> Vec<String> {
         let mut child = vec![String::new(); p1.len()];
         let segment: Vec<String> = p1[start..=end].to_vec();
 
@@ -220,8 +220,10 @@ impl GeneticOperators {
             if child_idx == start {
                 break;
             }
-            if !segment.contains(item) || segment.iter().filter(|&x| x == item).count()
-               < p2.iter().filter(|&x| x == item).count() {
+            if !segment.contains(item)
+                || segment.iter().filter(|&x| x == item).count()
+                    < p2.iter().filter(|&x| x == item).count()
+            {
                 if child[child_idx].is_empty() {
                     child[child_idx] = item.clone();
                     child_idx = (child_idx + 1) % p1.len();

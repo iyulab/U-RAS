@@ -82,7 +82,10 @@ impl Calendar {
         // Check if in any time window
         let in_window = self.time_windows.iter().any(|w| w.contains(timestamp_ms));
         // Check if not blocked
-        let not_blocked = !self.blocked_periods.iter().any(|w| w.contains(timestamp_ms));
+        let not_blocked = !self
+            .blocked_periods
+            .iter()
+            .any(|w| w.contains(timestamp_ms));
 
         in_window && not_blocked
     }
@@ -136,18 +139,17 @@ mod tests {
     #[test]
     fn test_calendar_availability() {
         let calendar = Calendar::new("cal1")
-            .with_window(0, 8 * 3600 * 1000)      // 0-8 hours
+            .with_window(0, 8 * 3600 * 1000) // 0-8 hours
             .with_window(9 * 3600 * 1000, 17 * 3600 * 1000); // 9-17 hours
 
-        assert!(calendar.is_working_time(4 * 3600 * 1000));  // 4 AM
+        assert!(calendar.is_working_time(4 * 3600 * 1000)); // 4 AM
         assert!(!calendar.is_working_time(8 * 3600 * 1000 + 1000)); // 8 AM + 1s
         assert!(calendar.is_working_time(12 * 3600 * 1000)); // 12 PM
     }
 
     #[test]
     fn test_blocked_periods() {
-        let calendar = Calendar::always_available("cal1")
-            .with_blocked(5000, 10000);
+        let calendar = Calendar::always_available("cal1").with_blocked(5000, 10000);
 
         assert!(calendar.is_working_time(3000));
         assert!(!calendar.is_working_time(7000));

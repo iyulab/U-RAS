@@ -1,8 +1,8 @@
 //! CP Solver - Constraint Programming Solver Interface
 
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
 use crate::cp::model::CpModel;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// Solver 상태
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
@@ -101,7 +101,7 @@ pub struct SolverConfig {
 impl Default for SolverConfig {
     fn default() -> Self {
         Self {
-            time_limit_ms: 60_000,  // 1분
+            time_limit_ms: 60_000, // 1분
             max_nodes: 1_000_000,
             num_workers: 4,
             log_search: false,
@@ -149,12 +149,15 @@ impl CpSolver for SimpleCpSolver {
             let duration = interval.duration.fixed.unwrap_or(interval.duration.min);
             let end = start + duration;
 
-            solution.intervals.insert(name.clone(), IntervalSolution {
-                start,
-                end,
-                duration,
-                is_present: true,
-            });
+            solution.intervals.insert(
+                name.clone(),
+                IntervalSolution {
+                    start,
+                    end,
+                    duration,
+                    is_present: true,
+                },
+            );
 
             current_time.insert(name.clone(), end);
         }
@@ -188,19 +191,25 @@ mod tests {
     fn test_solution_makespan() {
         let mut solution = CpSolution::empty(SolverStatus::Feasible);
 
-        solution.intervals.insert("op1".into(), IntervalSolution {
-            start: 0,
-            end: 50_000,
-            duration: 50_000,
-            is_present: true,
-        });
+        solution.intervals.insert(
+            "op1".into(),
+            IntervalSolution {
+                start: 0,
+                end: 50_000,
+                duration: 50_000,
+                is_present: true,
+            },
+        );
 
-        solution.intervals.insert("op2".into(), IntervalSolution {
-            start: 10_000,
-            end: 80_000,
-            duration: 70_000,
-            is_present: true,
-        });
+        solution.intervals.insert(
+            "op2".into(),
+            IntervalSolution {
+                start: 10_000,
+                end: 80_000,
+                duration: 70_000,
+                is_present: true,
+            },
+        );
 
         assert_eq!(solution.makespan(), 80_000);
     }

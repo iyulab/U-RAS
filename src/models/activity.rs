@@ -161,9 +161,8 @@ impl Activity {
 
     /// Add simple resource candidates (shorthand)
     pub fn with_resources(mut self, resource_type: &str, candidates: Vec<String>) -> Self {
-        self.resource_requirements.push(
-            ResourceRequirement::new(resource_type).with_candidates(candidates)
-        );
+        self.resource_requirements
+            .push(ResourceRequirement::new(resource_type).with_candidates(candidates));
         self
     }
 

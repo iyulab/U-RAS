@@ -50,13 +50,13 @@
 //! assert!(schedule.makespan_ms > 0);
 //! ```
 
+pub mod cp;
+pub mod ga;
 pub mod models;
 pub mod scheduler;
-pub mod ga;
-pub mod cp;
 pub mod validation;
 
+pub use cp::*;
+pub use ga::*;
 pub use models::*;
 pub use scheduler::*;
-pub use ga::*;
-pub use cp::*;

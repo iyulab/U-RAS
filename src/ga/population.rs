@@ -2,10 +2,10 @@
 //!
 //! Population creation, selection, and generation management
 
-use rand::prelude::*;
-use crate::ga::chromosome::{Chromosome, ActivityInfo};
-use crate::ga::operators::{GeneticOperators, tournament_selection};
+use crate::ga::chromosome::{ActivityInfo, Chromosome};
+use crate::ga::operators::{tournament_selection, GeneticOperators};
 use crate::models::Resource;
+use rand::prelude::*;
 
 /// Population manager
 #[derive(Debug)]
@@ -83,7 +83,11 @@ impl Population {
         // Shortest processing time (25%)
         let process_times = build_process_times(activities);
         for _ in 0..shortest_time_count {
-            individuals.push(Chromosome::with_shortest_time(activities, &process_times, rng));
+            individuals.push(Chromosome::with_shortest_time(
+                activities,
+                &process_times,
+                rng,
+            ));
         }
 
         Self {
@@ -97,14 +101,12 @@ impl Population {
     }
 
     /// Evolve to next generation
-    pub fn evolve(
-        &mut self,
-        activities: &[ActivityInfo],
-        rng: &mut impl Rng,
-    ) {
+    pub fn evolve(&mut self, activities: &[ActivityInfo], rng: &mut impl Rng) {
         // Sort by fitness (lower is better)
         self.individuals.sort_by(|a, b| {
-            a.fitness.partial_cmp(&b.fitness).unwrap_or(std::cmp::Ordering::Equal)
+            a.fitness
+                .partial_cmp(&b.fitness)
+                .unwrap_or(std::cmp::Ordering::Equal)
         });
 
         // Update best individual
@@ -134,12 +136,8 @@ impl Population {
             let parent2 = tournament_selection(&self.individuals, self.params.tournament_size, rng);
 
             // Crossover
-            let (mut child1, mut child2) = self.operators.crossover(
-                parent1,
-                parent2,
-                activities,
-                rng,
-            );
+            let (mut child1, mut child2) =
+                self.operators.crossover(parent1, parent2, activities, rng);
 
             // Mutation
             self.operators.mutate(&mut child1, activities, rng);
@@ -164,7 +162,8 @@ impl Population {
             return false;
         }
 
-        let recent = &self.fitness_history[self.fitness_history.len() - self.params.convergence_generations..];
+        let recent = &self.fitness_history
+            [self.fitness_history.len() - self.params.convergence_generations..];
 
         if recent.is_empty() {
             return false;
@@ -191,10 +190,8 @@ impl Population {
         let sum: f64 = fitnesses.iter().sum();
         let mean = sum / fitnesses.len() as f64;
 
-        let variance: f64 = fitnesses
-            .iter()
-            .map(|f| (f - mean).powi(2))
-            .sum::<f64>() / fitnesses.len() as f64;
+        let variance: f64 =
+            fitnesses.iter().map(|f| (f - mean).powi(2)).sum::<f64>() / fitnesses.len() as f64;
 
         let std_dev = variance.sqrt();
 
@@ -231,7 +228,10 @@ fn build_process_times(
 
     for act in activities {
         for resource in &act.candidates {
-            times.insert((act.activity_id.clone(), resource.clone()), act.process_time_ms);
+            times.insert(
+                (act.activity_id.clone(), resource.clone()),
+                act.process_time_ms,
+            );
         }
     }
 
@@ -421,6 +421,9 @@ mod tests {
         population.evolve(&activities, &mut rng);
 
         // Best individual should be preserved
-        assert!(population.individuals.iter().any(|c| c.osv == best_before.osv));
+        assert!(population
+            .individuals
+            .iter()
+            .any(|c| c.osv == best_before.osv));
     }
 }

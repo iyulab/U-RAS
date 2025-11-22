@@ -4,9 +4,9 @@
 //! - OSV (Operation Sequence Vector): Activity execution order
 //! - MAV (Machine Assignment Vector): Resource assignment
 
-use std::collections::HashMap;
-use rand::prelude::*;
 use crate::models::{Resource, ResourceType};
+use rand::prelude::*;
+use std::collections::HashMap;
 
 /// Chromosome with dual-vector encoding
 #[derive(Debug, Clone, PartialEq)]

@@ -2,7 +2,7 @@
 //!
 //! Ensures data integrity before scheduling
 
-use crate::models::{Task, Resource};
+use crate::models::{Resource, Task};
 
 /// Validation result
 #[derive(Debug, Clone)]
@@ -48,7 +48,8 @@ pub fn validate_input(tasks: &[Task], resources: &[Resource]) -> ValidationResul
     let mut task_ids = std::collections::HashSet::new();
     for task in tasks {
         if !task_ids.insert(&task.id) {
-            result = result.with_error("DUPLICATE_TASK", &format!("Duplicate task ID: {}", task.id));
+            result =
+                result.with_error("DUPLICATE_TASK", &format!("Duplicate task ID: {}", task.id));
         }
     }
 
@@ -56,7 +57,10 @@ pub fn validate_input(tasks: &[Task], resources: &[Resource]) -> ValidationResul
     let mut resource_ids = std::collections::HashSet::new();
     for resource in resources {
         if !resource_ids.insert(resource.id.clone()) {
-            result = result.with_error("DUPLICATE_RESOURCE", &format!("Duplicate resource ID: {}", resource.id));
+            result = result.with_error(
+                "DUPLICATE_RESOURCE",
+                &format!("Duplicate resource ID: {}", resource.id),
+            );
         }
     }
 
@@ -68,7 +72,10 @@ pub fn validate_input(tasks: &[Task], resources: &[Resource]) -> ValidationResul
                 if !resource_ids.contains(candidate) {
                     result = result.with_error(
                         "INVALID_RESOURCE_REF",
-                        &format!("Activity {} references unknown resource {}", activity.id, candidate)
+                        &format!(
+                            "Activity {} references unknown resource {}",
+                            activity.id, candidate
+                        ),
                     );
                 }
             }
@@ -85,12 +92,9 @@ mod tests {
 
     #[test]
     fn test_valid_input() {
-        let tasks = vec![
-            Task::new("T1").with_activity(
-                Activity::new("A1", "T1", 1)
-                    .with_resources("machine", vec!["M1".into()])
-            )
-        ];
+        let tasks = vec![Task::new("T1").with_activity(
+            Activity::new("A1", "T1", 1).with_resources("machine", vec!["M1".into()]),
+        )];
         let resources = vec![Resource::primary("M1")];
 
         let result = validate_input(&tasks, &resources);
@@ -108,12 +112,9 @@ mod tests {
 
     #[test]
     fn test_invalid_resource_reference() {
-        let tasks = vec![
-            Task::new("T1").with_activity(
-                Activity::new("A1", "T1", 1)
-                    .with_resources("machine", vec!["UNKNOWN".into()])
-            )
-        ];
+        let tasks = vec![Task::new("T1").with_activity(
+            Activity::new("A1", "T1", 1).with_resources("machine", vec!["UNKNOWN".into()]),
+        )];
         let resources = vec![Resource::primary("M1")];
 
         let result = validate_input(&tasks, &resources);

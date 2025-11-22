@@ -2,9 +2,9 @@
 //!
 //! Domain-agnostic representation of schedulable work
 
+use super::activity::Activity;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use super::activity::Activity;
 
 /// Task - Abstract schedulable work unit
 ///
@@ -129,12 +129,10 @@ mod tests {
     fn test_task_with_activities() {
         let task = Task::new("T1")
             .with_activity(
-                Activity::new("A1", "T1", 1)
-                    .with_duration(ActivityDuration::fixed(5000))
+                Activity::new("A1", "T1", 1).with_duration(ActivityDuration::fixed(5000)),
             )
             .with_activity(
-                Activity::new("A2", "T1", 2)
-                    .with_duration(ActivityDuration::fixed(3000))
+                Activity::new("A2", "T1", 2).with_duration(ActivityDuration::fixed(3000)),
             );
 
         assert_eq!(task.activities.len(), 2);

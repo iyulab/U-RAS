@@ -2,9 +2,9 @@
 //!
 //! Metrics for evaluating schedule quality
 
+use crate::models::{Schedule, Task};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use crate::models::{Schedule, Task};
 
 /// Schedule quality metrics
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -53,9 +53,7 @@ impl ScheduleKpi {
                 }
 
                 // Calculate flow time
-                let release = task.release_time
-                    .map(|t| t.timestamp_millis())
-                    .unwrap_or(0);
+                let release = task.release_time.map(|t| t.timestamp_millis()).unwrap_or(0);
                 total_flow_time += completion - release;
             }
         }
@@ -114,7 +112,7 @@ impl Default for ScheduleKpi {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{Activity, ActivityDuration, Resource, Assignment};
+    use crate::models::{Activity, ActivityDuration, Assignment, Resource};
     use chrono::Utc;
 
     #[test]
@@ -124,10 +122,12 @@ mod tests {
         schedule.add_assignment(Assignment::new("A2", "T2", "R1", 5000, 8000));
 
         let tasks = vec![
-            Task::new("T1")
-                .with_activity(Activity::new("A1", "T1", 1).with_duration(ActivityDuration::fixed(5000))),
-            Task::new("T2")
-                .with_activity(Activity::new("A2", "T2", 1).with_duration(ActivityDuration::fixed(3000))),
+            Task::new("T1").with_activity(
+                Activity::new("A1", "T1", 1).with_duration(ActivityDuration::fixed(5000)),
+            ),
+            Task::new("T2").with_activity(
+                Activity::new("A2", "T2", 1).with_duration(ActivityDuration::fixed(3000)),
+            ),
         ];
 
         let kpi = ScheduleKpi::calculate(&schedule, &tasks);

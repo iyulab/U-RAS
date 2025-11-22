@@ -2,8 +2,8 @@
 //!
 //! Fast heuristic scheduler for baseline solutions
 
+use crate::models::{Assignment, Resource, Schedule, Task, TransitionMatrixCollection};
 use std::collections::HashMap;
-use crate::models::{Task, Resource, Schedule, Assignment, TransitionMatrixCollection};
 
 /// Simple priority-based scheduler
 pub struct SimpleScheduler {
@@ -55,12 +55,7 @@ impl SimpleScheduler {
     }
 
     /// Schedule tasks on resources
-    pub fn schedule(
-        &self,
-        tasks: &[Task],
-        resources: &[Resource],
-        start_time_ms: i64,
-    ) -> Schedule {
+    pub fn schedule(&self, tasks: &[Task], resources: &[Resource], start_time_ms: i64) -> Schedule {
         let mut schedule = Schedule::new();
         let mut resource_available: HashMap<String, i64> = HashMap::new();
         let mut last_category: HashMap<String, String> = HashMap::new();
@@ -139,7 +134,8 @@ impl SimpleScheduler {
 
     /// Schedule from request
     pub fn schedule_request(&self, request: &ScheduleRequest) -> Schedule {
-        let scheduler = self.clone()
+        let scheduler = self
+            .clone()
             .with_transition_matrices(request.transition_matrices.clone());
 
         scheduler.schedule(&request.tasks, &request.resources, request.start_time_ms)
@@ -167,20 +163,16 @@ mod tests {
 
     fn create_test_scenario() -> (Vec<Task>, Vec<Resource>) {
         let tasks = vec![
-            Task::new("T1")
-                .with_priority(5)
-                .with_activity(
-                    Activity::new("T1-A1", "T1", 1)
-                        .with_duration(ActivityDuration::fixed(5000))
-                        .with_resources("machine", vec!["M1".into(), "M2".into()])
-                ),
-            Task::new("T2")
-                .with_priority(3)
-                .with_activity(
-                    Activity::new("T2-A1", "T2", 1)
-                        .with_duration(ActivityDuration::fixed(3000))
-                        .with_resources("machine", vec!["M1".into()])
-                ),
+            Task::new("T1").with_priority(5).with_activity(
+                Activity::new("T1-A1", "T1", 1)
+                    .with_duration(ActivityDuration::fixed(5000))
+                    .with_resources("machine", vec!["M1".into(), "M2".into()]),
+            ),
+            Task::new("T2").with_priority(3).with_activity(
+                Activity::new("T2-A1", "T2", 1)
+                    .with_duration(ActivityDuration::fixed(3000))
+                    .with_resources("machine", vec!["M1".into()]),
+            ),
         ];
 
         let resources = vec![
@@ -224,12 +216,12 @@ mod tests {
             .with_activity(
                 Activity::new("T1-A1", "T1", 1)
                     .with_duration(ActivityDuration::fixed(3000))
-                    .with_resources("machine", vec!["M1".into()])
+                    .with_resources("machine", vec!["M1".into()]),
             )
             .with_activity(
                 Activity::new("T1-A2", "T1", 2)
                     .with_duration(ActivityDuration::fixed(2000))
-                    .with_resources("machine", vec!["M1".into()])
+                    .with_resources("machine", vec!["M1".into()]),
             );
 
         let resources = vec![Resource::primary("M1")];

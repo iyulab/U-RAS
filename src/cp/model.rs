@@ -1,8 +1,8 @@
 //! CP Model - Constraint Programming Model Definition
 
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
 use crate::cp::variables::*;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 /// CP 제약 조건
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -91,13 +91,9 @@ pub enum Objective {
         weights: HashMap<String, f64>,
     },
     /// 가중합 최소화
-    MinimizeWeightedSum {
-        terms: Vec<(String, f64)>,
-    },
+    MinimizeWeightedSum { terms: Vec<(String, f64)> },
     /// 다목적 (계층적)
-    Hierarchical {
-        objectives: Vec<Objective>,
-    },
+    Hierarchical { objectives: Vec<Objective> },
 }
 
 /// CP 모델
@@ -162,11 +158,7 @@ impl CpModel {
     }
 
     /// Setup Time이 있는 비중첩 제약 추가
-    pub fn add_no_overlap_with_setup(
-        &mut self,
-        intervals: Vec<String>,
-        matrix: TransitionMatrix,
-    ) {
+    pub fn add_no_overlap_with_setup(&mut self, intervals: Vec<String>, matrix: TransitionMatrix) {
         self.constraints.push(Constraint::NoOverlap {
             intervals,
             transition_matrix: Some(matrix),
@@ -174,12 +166,7 @@ impl CpModel {
     }
 
     /// 누적 제약 추가
-    pub fn add_cumulative(
-        &mut self,
-        intervals: Vec<String>,
-        demands: Vec<i64>,
-        capacity: i64,
-    ) {
+    pub fn add_cumulative(&mut self, intervals: Vec<String>, demands: Vec<i64>, capacity: i64) {
         self.constraints.push(Constraint::Cumulative {
             intervals,
             demands,
@@ -218,7 +205,9 @@ impl CpModel {
                         }
                     }
                 }
-                Constraint::Cumulative { intervals, demands, .. } => {
+                Constraint::Cumulative {
+                    intervals, demands, ..
+                } => {
                     if intervals.len() != demands.len() {
                         return Err("Cumulative: intervals and demands length mismatch".into());
                     }
@@ -268,9 +257,7 @@ mod tests {
 
     #[test]
     fn test_transition_matrix() {
-        let mut matrix = TransitionMatrix::new(vec![
-            "A".into(), "B".into(), "C".into()
-        ]);
+        let mut matrix = TransitionMatrix::new(vec!["A".into(), "B".into(), "C".into()]);
 
         matrix.set_time("A", "B", 10_000);
         matrix.set_time("B", "C", 5_000);
