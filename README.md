@@ -15,7 +15,7 @@ U-RAS provides domain-agnostic optimization algorithms that can be applied to va
 
 ### Use Cases
 
-- **Manufacturing** - Production scheduling, job-shop problems (via [U-APS](https://github.com/iyulab/U-APS))
+- **Manufacturing** - Production scheduling, job-shop problems (via [U-APS](https://github.com/iyulab/U-APS-releases))
 - **Healthcare** - Operating room scheduling, staff allocation
 - **Logistics** - Route optimization, fleet management
 - **Education** - Timetabling, exam scheduling
@@ -157,10 +157,7 @@ Benchmarks on typical scheduling problems:
 
 Licensed under either of:
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE))
 - MIT license ([LICENSE-MIT](LICENSE-MIT))
-
-at your option.
 
 ## Contributing
 
@@ -168,4 +165,4 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for gu
 
 ## Related Projects
 
-- [U-APS](https://github.com/iyulab/U-APS) - Manufacturing scheduling system built on U-RAS
+- [U-APS](https://github.com/iyulab/U-APS-releases) - Manufacturing scheduling system built on U-RAS
