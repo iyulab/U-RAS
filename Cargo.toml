@@ -6,7 +6,7 @@ description = "High-performance optimization algorithms: GA, CP-SAT, and constra
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/iyulab/U-RAS"
 readme = "README.md"
-keywords = ["genetic-algorithm", "constraint-programming", "optimization", "scheduling", "cp-sat"]
+keywords = ["genetic-algorithm", "constraints", "optimization", "scheduling", "cp-sat"]
 categories = ["algorithms", "science"]
 authors = ["iyulab team"]
 
