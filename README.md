@@ -1,6 +1,6 @@
 # U-RAS
 
-**Universal Rust Algorithm Suite** - High-performance optimization algorithms with C FFI support
+**Resource Allocation and Scheduling** - High-performance optimization algorithms in Rust with C FFI support
 
 [![Crates.io](https://img.shields.io/crates/v/u-ras.svg)](https://crates.io/crates/u-ras)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
