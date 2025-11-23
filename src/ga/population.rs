@@ -39,6 +39,8 @@ pub struct GaParams {
     pub convergence_generations: usize,
     /// Convergence threshold
     pub convergence_threshold: f64,
+    /// Time limit in milliseconds (None = no limit)
+    pub time_limit_ms: Option<i64>,
 }
 
 impl Default for GaParams {
@@ -50,6 +52,7 @@ impl Default for GaParams {
             tournament_size: 3,
             convergence_generations: 50,
             convergence_threshold: 0.001,
+            time_limit_ms: None,
         }
     }
 }
