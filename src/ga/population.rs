@@ -57,6 +57,64 @@ impl Default for GaParams {
     }
 }
 
+impl GaParams {
+    /// Fast preset for small problems (< 50 ops)
+    pub fn fast() -> Self {
+        Self {
+            population_size: 50,
+            max_generations: 100,
+            elite_ratio: 0.15,
+            tournament_size: 3,
+            convergence_generations: 20,
+            convergence_threshold: 0.005,
+            time_limit_ms: Some(10_000),
+        }
+    }
+
+    /// Balanced preset for medium problems (50-200 ops)
+    pub fn balanced() -> Self {
+        Self {
+            population_size: 100,
+            max_generations: 300,
+            elite_ratio: 0.1,
+            tournament_size: 4,
+            convergence_generations: 30,
+            convergence_threshold: 0.002,
+            time_limit_ms: Some(30_000),
+        }
+    }
+
+    /// Quality preset for large problems (200+ ops)
+    pub fn quality() -> Self {
+        Self {
+            population_size: 150,
+            max_generations: 500,
+            elite_ratio: 0.1,
+            tournament_size: 5,
+            convergence_generations: 50,
+            convergence_threshold: 0.001,
+            time_limit_ms: Some(60_000),
+        }
+    }
+
+    /// Auto-select based on operation count
+    pub fn auto_select(operation_count: usize) -> Self {
+        if operation_count < 50 {
+            Self::fast()
+        } else if operation_count < 200 {
+            Self::balanced()
+        } else {
+            Self::quality()
+        }
+    }
+
+    /// Set custom timeout
+    pub fn with_timeout(mut self, timeout_ms: i64) -> Self {
+        self.time_limit_ms = Some(timeout_ms);
+        self
+    }
+}
+
 impl Population {
     /// Create initial population
     pub fn new(
