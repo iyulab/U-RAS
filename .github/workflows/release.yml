@@ -60,7 +60,9 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-          cp target/${{ matrix.target }}/release/${{ matrix.lib_name }} artifacts/u_ras-${{ matrix.rid }}.${{ matrix.lib_name ##*.}}
+          LIB_NAME="${{ matrix.lib_name }}"
+          EXT="${LIB_NAME##*.}"
+          cp target/${{ matrix.target }}/release/${{ matrix.lib_name }} artifacts/u_ras-${{ matrix.rid }}.$EXT
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
