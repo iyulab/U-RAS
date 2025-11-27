@@ -112,8 +112,7 @@ impl Default for ScheduleKpi {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{Activity, ActivityDuration, Assignment, Resource};
-    use chrono::Utc;
+    use crate::models::{Activity, ActivityDuration, Assignment};
 
     #[test]
     fn test_kpi_calculation() {

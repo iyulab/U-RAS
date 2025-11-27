@@ -88,7 +88,7 @@ pub fn validate_input(tasks: &[Task], resources: &[Resource]) -> ValidationResul
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::models::{Activity, ActivityDuration};
+    use crate::models::Activity;
 
     #[test]
     fn test_valid_input() {

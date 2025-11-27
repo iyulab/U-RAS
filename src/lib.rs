@@ -51,12 +51,14 @@
 //! ```
 
 pub mod cp;
+pub mod dispatching;
 pub mod ga;
 pub mod models;
 pub mod scheduler;
 pub mod validation;
 
 pub use cp::*;
+pub use dispatching::*;
 pub use ga::*;
 pub use models::*;
 pub use scheduler::*;
