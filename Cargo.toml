@@ -1,6 +1,6 @@
 [package]
 name = "u-ras"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "High-performance optimization algorithms: GA, CP-SAT, and constraint propagation"
 license = "MIT OR Apache-2.0"
