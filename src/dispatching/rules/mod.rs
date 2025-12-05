@@ -5,12 +5,14 @@
 //! - [`Lpt`] - Longest Processing Time
 //! - [`Lwkr`] - Least Work Remaining
 //! - [`Mwkr`] - Most Work Remaining
+//! - [`Wspt`] - Weighted Shortest Processing Time
 //!
 //! # Due Date Rules
 //! - [`Edd`] - Earliest Due Date
 //! - [`Mst`] - Minimum Slack Time
 //! - [`Cr`] - Critical Ratio
 //! - [`Sro`] - Slack per Remaining Operations
+//! - [`Atc`] - Apparent Tardiness Cost
 //!
 //! # Queue/Load Rules
 //! - [`Fifo`] - First In First Out

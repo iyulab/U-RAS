@@ -27,6 +27,10 @@ pub struct SchedulingContext {
     /// Task arrival times for FIFO ordering
     pub arrival_times: HashMap<String, DateTime<Utc>>,
 
+    /// Average processing time across waiting tasks (in ms)
+    /// Used by ATC rule for normalization
+    pub average_processing_time: Option<f64>,
+
     /// Custom attributes for domain-specific rules
     pub attributes: HashMap<String, String>,
 }
@@ -40,6 +44,7 @@ impl SchedulingContext {
             next_queue_length: HashMap::new(),
             resource_utilization: HashMap::new(),
             arrival_times: HashMap::new(),
+            average_processing_time: None,
             attributes: HashMap::new(),
         }
     }
@@ -70,6 +75,12 @@ impl SchedulingContext {
     /// Set resource utilization
     pub fn with_utilization(mut self, resource_id: impl Into<String>, load: f64) -> Self {
         self.resource_utilization.insert(resource_id.into(), load);
+        self
+    }
+
+    /// Set average processing time (for ATC rule normalization)
+    pub fn with_average_processing_time(mut self, avg_ms: f64) -> Self {
+        self.average_processing_time = Some(avg_ms);
         self
     }
 

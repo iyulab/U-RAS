@@ -1,13 +1,13 @@
 [package]
 name = "u-ras"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
-description = "High-performance optimization algorithms: GA, CP-SAT, and constraint propagation"
+description = "Universal Resource Allocation and Scheduling - Domain-agnostic optimization with GA, CP-SAT, dispatching rules, and time constraints"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/iyulab/U-RAS"
 readme = "README.md"
-keywords = ["genetic-algorithm", "constraints", "optimization", "scheduling", "cp-sat"]
-categories = ["algorithms", "science"]
+keywords = ["scheduling", "optimization", "genetic-algorithm", "dispatching-rules", "resource-allocation"]
+categories = ["algorithms", "science", "simulation"]
 authors = ["iyulab team"]
 
 [dependencies]

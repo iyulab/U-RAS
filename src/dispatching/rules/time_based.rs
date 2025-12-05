@@ -90,6 +90,44 @@ impl DispatchingRule for Lwkr {
     }
 }
 
+/// WSPT - Weighted Shortest Processing Time
+///
+/// Prioritizes tasks with highest weight-to-processing-time ratio.
+/// Minimizes weighted total completion time.
+///
+/// Score = -weight/processing_time (negative because higher ratio = higher priority)
+/// Uses task.priority as weight (lower priority value = higher weight in scheduling)
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Wspt;
+
+impl DispatchingRule for Wspt {
+    fn name(&self) -> &'static str {
+        "WSPT"
+    }
+
+    fn description(&self) -> &'static str {
+        "Weighted Shortest Processing Time - prioritize by weight/time ratio"
+    }
+
+    fn evaluate(&self, task: &Task, _context: &SchedulingContext) -> RuleScore {
+        let processing_time: f64 = task.activities
+            .iter()
+            .map(|a| a.duration.total_ms() as f64)
+            .sum();
+
+        if processing_time <= 0.0 {
+            return f64::MAX; // Avoid division by zero
+        }
+
+        // Use priority as weight (lower priority = higher weight)
+        // We invert priority so that priority=1 has higher weight than priority=10
+        let weight = 1000.0 / (task.priority as f64 + 1.0);
+
+        // Negative because higher ratio should have lower (better) score
+        -(weight / processing_time)
+    }
+}
+
 /// MWKR - Most Work Remaining
 ///
 /// Prioritizes tasks with the most remaining work.
@@ -199,5 +237,64 @@ mod tests {
 
         // T2 has more remaining work, should have lower (better) score in MWKR
         assert!(mwkr.evaluate(&task2, &ctx) < mwkr.evaluate(&task1, &ctx));
+    }
+
+    fn make_task_with_priority(id: &str, durations: &[i64], priority: i32) -> Task {
+        let activities = durations
+            .iter()
+            .enumerate()
+            .map(|(i, &d)| {
+                Activity::new(&format!("{}-A{}", id, i), id, i as i32 + 1)
+                    .with_duration(ActivityDuration::fixed(d))
+            })
+            .collect();
+
+        Task {
+            id: id.to_string(),
+            name: id.to_string(),
+            category: String::new(),
+            priority,
+            deadline: None,
+            release_time: None,
+            activities,
+            attributes: Default::default(),
+        }
+    }
+
+    #[test]
+    fn test_wspt_prioritizes_high_weight_short_time() {
+        // High priority (low value = high weight) short task
+        let high_priority_short = make_task_with_priority("hp_short", &[1000], 1);
+        // Low priority (high value = low weight) long task
+        let low_priority_long = make_task_with_priority("lp_long", &[5000], 10);
+
+        let ctx = SchedulingContext::default();
+        let wspt = Wspt;
+
+        // High weight / short time should have lower (better) score
+        assert!(wspt.evaluate(&high_priority_short, &ctx) < wspt.evaluate(&low_priority_long, &ctx));
+    }
+
+    #[test]
+    fn test_wspt_weight_vs_time_tradeoff() {
+        // Short task with low priority
+        let short_low = make_task_with_priority("short_low", &[1000], 10);
+        // Long task with high priority
+        let long_high = make_task_with_priority("long_high", &[10000], 1);
+
+        let ctx = SchedulingContext::default();
+        let wspt = Wspt;
+
+        // WSPT considers ratio: short_low = (1000/11) / 1000 = 0.091
+        // long_high = (1000/2) / 10000 = 0.05
+        // short_low has better ratio
+        let score_short = wspt.evaluate(&short_low, &ctx);
+        let score_long = wspt.evaluate(&long_high, &ctx);
+
+        // Both should be valid finite negative values
+        assert!(score_short.is_finite());
+        assert!(score_long.is_finite());
+        assert!(score_short < 0.0);
+        assert!(score_long < 0.0);
     }
 }

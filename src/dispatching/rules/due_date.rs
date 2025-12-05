@@ -115,6 +115,101 @@ impl DispatchingRule for Cr {
     }
 }
 
+/// ATC - Apparent Tardiness Cost
+///
+/// Combines SPT with due date urgency using exponential decay.
+/// Widely used in practice for weighted tardiness minimization.
+///
+/// Formula: ATC_j = (w_j / p_j) * exp(-max(d_j - p_j - t, 0) / (k * p_avg))
+///
+/// Where:
+/// - w_j = weight (derived from priority)
+/// - p_j = processing time of task j
+/// - d_j = due date of task j
+/// - t = current time
+/// - k = lookahead parameter (higher = more SPT-like, lower = more EDD-like)
+/// - p_avg = average processing time (approximated by task's own time)
+///
+/// Score = -ATC (negative because higher ATC = higher priority = lower score)
+#[derive(Debug, Clone, Copy)]
+pub struct Atc {
+    /// Lookahead parameter k (default: 2.0)
+    /// - Higher k → behaves more like SPT
+    /// - Lower k → behaves more like EDD
+    pub k: f64,
+}
+
+impl Default for Atc {
+    fn default() -> Self {
+        Self { k: 2.0 }
+    }
+}
+
+impl Atc {
+    /// Create ATC rule with custom lookahead parameter
+    pub fn with_k(k: f64) -> Self {
+        Self { k: k.max(0.1) } // Prevent zero/negative k
+    }
+}
+
+impl DispatchingRule for Atc {
+    fn name(&self) -> &'static str {
+        "ATC"
+    }
+
+    fn description(&self) -> &'static str {
+        "Apparent Tardiness Cost - balance SPT and due date urgency"
+    }
+
+    fn evaluate(&self, task: &Task, context: &SchedulingContext) -> RuleScore {
+        // Calculate processing time
+        let processing_time: f64 = task.activities
+            .iter()
+            .map(|a| a.duration.total_ms() as f64)
+            .sum();
+
+        if processing_time <= 0.0 {
+            return f64::MAX;
+        }
+
+        // Weight from priority (lower priority value = higher weight)
+        let weight = 1000.0 / (task.priority as f64 + 1.0);
+
+        // Get due date or return SPT-like score for tasks without deadline
+        let deadline_ms = match task.deadline {
+            Some(d) => d.timestamp_millis() as f64,
+            None => {
+                // No deadline: use pure weighted SPT
+                return -(weight / processing_time);
+            }
+        };
+
+        let current_ms = context.current_time.timestamp_millis() as f64;
+
+        // Calculate slack: time until deadline minus processing time
+        let slack = deadline_ms - processing_time - current_ms;
+
+        // Use average processing time approximation
+        // In practice, this could come from context.average_processing_time
+        let p_avg = context.average_processing_time
+            .unwrap_or(processing_time)
+            .max(1.0);
+
+        // ATC formula
+        // exp(-max(slack, 0) / (k * p_avg))
+        let urgency = if slack <= 0.0 {
+            1.0 // Maximum urgency when slack is negative (already late)
+        } else {
+            (-slack / (self.k * p_avg)).exp()
+        };
+
+        let atc_score = (weight / processing_time) * urgency;
+
+        // Negative because higher ATC = higher priority = lower score
+        -atc_score
+    }
+}
+
 /// S/RO - Slack per Remaining Operations
 ///
 /// Distributes slack evenly across remaining operations.
@@ -270,5 +365,79 @@ mod tests {
         // multi_op: slack/2 = 2500
         // multi_op has less slack per op, should be more urgent
         assert!(sro.evaluate(&multi_op, &ctx) < sro.evaluate(&single_op, &ctx));
+    }
+
+    #[test]
+    fn test_atc_prioritizes_urgent_short_tasks() {
+        // Short task with tight deadline should have high ATC
+        let urgent_short = make_task_with_deadline("urgent_short", 1000, 2000);
+        // Long task with relaxed deadline
+        let relaxed_long = make_task_with_deadline("relaxed_long", 5000, 20000);
+
+        let ctx = SchedulingContext::at_epoch();
+        let atc = Atc::default();
+
+        // Urgent short task should have lower (better) score
+        assert!(atc.evaluate(&urgent_short, &ctx) < atc.evaluate(&relaxed_long, &ctx));
+    }
+
+    #[test]
+    fn test_atc_maximum_urgency_when_late() {
+        // Already late task (deadline passed)
+        let late = make_task_with_deadline("late", 5000, 1000); // Due at 1000, needs 5000 work
+        // On-time task
+        let ontime = make_task_with_deadline("ontime", 5000, 20000);
+
+        let ctx = SchedulingContext::at_epoch();
+        let atc = Atc::default();
+
+        // Late task should have higher urgency = lower score
+        assert!(atc.evaluate(&late, &ctx) < atc.evaluate(&ontime, &ctx));
+    }
+
+    #[test]
+    fn test_atc_no_deadline_uses_wspt() {
+        // Task without deadline falls back to WSPT behavior
+        let no_deadline = Task {
+            id: "no_dl".to_string(),
+            name: "no_dl".to_string(),
+            category: String::new(),
+            priority: 0,
+            deadline: None,
+            release_time: None,
+            activities: vec![
+                Activity::new("no_dl-A1", "no_dl", 1)
+                    .with_duration(ActivityDuration::fixed(5000))
+            ],
+            attributes: Default::default(),
+        };
+
+        let ctx = SchedulingContext::at_epoch();
+        let atc = Atc::default();
+
+        // Should return a valid score (not MAX)
+        let score = atc.evaluate(&no_deadline, &ctx);
+        assert!(score.is_finite());
+        assert!(score < 0.0); // Negative because higher priority = lower score
+    }
+
+    #[test]
+    fn test_atc_k_parameter_effect() {
+        let task = make_task_with_deadline("task", 5000, 15000);
+        let ctx = SchedulingContext::at_epoch();
+
+        // Lower k = more EDD-like (due date matters more)
+        let atc_low_k = Atc::with_k(0.5);
+        // Higher k = more SPT-like (processing time matters more)
+        let atc_high_k = Atc::with_k(5.0);
+
+        let score_low_k = atc_low_k.evaluate(&task, &ctx);
+        let score_high_k = atc_high_k.evaluate(&task, &ctx);
+
+        // Both should be valid finite values
+        assert!(score_low_k.is_finite());
+        assert!(score_high_k.is_finite());
+        // Different k values should produce different scores
+        assert!((score_low_k - score_high_k).abs() > 1e-10);
     }
 }
